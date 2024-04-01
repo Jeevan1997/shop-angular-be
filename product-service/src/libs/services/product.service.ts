@@ -1,6 +1,7 @@
 import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
-import { DynamoDBDocumentClient, ScanCommand, GetCommand } from "@aws-sdk/lib-dynamodb";
-import { formatJSONResponse } from "@libs/api-gateway";
+import { DynamoDBDocumentClient, ScanCommand, GetCommand, PutCommand } from "@aws-sdk/lib-dynamodb";
+import { Product } from "@libs/model/product.model";
+import { randomUUID } from "crypto";
 
 
 const client = new DynamoDBClient({region: "us-east-1"});
@@ -54,6 +55,35 @@ export class ProductService {
             return Promise.resolve(jointedList);
         }
         return products;
-        
+    }
+
+    public createProduct = async (body) =>{
+        const product : Product = {
+            id: randomUUID(),
+            title: body.title,
+            description: body.description,
+            price: body.price
+        }
+        const productsCommand = new PutCommand({
+            TableName: process.env.PRODUCTS_TABLE_NAME,
+            Item: product
+        });
+
+        const productResponse = await docClient.send(productsCommand);
+
+       if(productResponse){
+        const stock = {
+            product_id: product.id,
+            count: body.count
+        }
+        const stockCommand = new PutCommand({
+            TableName: process.env.STOCKS_TABLE_NAME,
+            Item: stock
+        });
+
+        const stockResponse = await docClient.send(stockCommand);
+        return stockResponse;
+       }
+       return productResponse;
     }
 }
