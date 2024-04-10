@@ -10,7 +10,7 @@ const getProducts: ValidatedEventAPIGatewayProxyEvent<typeof schema> = async () 
   const productService = new ProductService();
   const productList = await productService.getProducts();
   if(!productList){
-    return formatJSONResponse({ error: "Products not found" });
+    return formatJSONResponse({ statusCode:400, error: "Products not found" });
   }
   else{
     return formatJSONResponse({productList});
