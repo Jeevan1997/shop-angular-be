@@ -6,11 +6,11 @@ export default {
     {
       http: {
         method: 'get',
-        path: 'import/{name}',
+        path: 'import',
         cors: true,
         request: {
           parameters: {
-            paths: {
+            querystrings: {
               name: true
             }
           }

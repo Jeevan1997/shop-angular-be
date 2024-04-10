@@ -10,7 +10,7 @@ const importProductsFile: ValidatedEventAPIGatewayProxyEvent<typeof schema> = as
 
   console.log('importProductsFile triggered', { event });
 
-  const fileName = event.pathParameters && event.pathParameters.name;
+  const fileName = event.queryStringParameters?.name;
 
   if (!fileName) {
     return formatJSONResponse(400, { error: 'Missing name query parameter' });
