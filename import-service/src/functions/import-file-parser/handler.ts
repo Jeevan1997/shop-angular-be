@@ -1,4 +1,3 @@
-import { middyfy } from '@libs/lambda';
 import { importService } from '@libs/services/import-service';
 import { S3Event } from 'aws-lambda';
 
@@ -17,4 +16,4 @@ export const importFileParser: S3Handler = async (event: S3Event) => {
       throw new Error(`Error reading and processing file: ${error.message}`);
   }
 }
-export const main = middyfy(importFileParser);
+export const main = importFileParser;

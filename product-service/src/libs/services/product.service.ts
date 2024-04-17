@@ -81,9 +81,9 @@ export class ProductService {
             Item: stock
         });
 
-        const stockResponse = await docClient.send(stockCommand);
-        return stockResponse;
+        await docClient.send(stockCommand);
+        return product;
        }
-       return productResponse;
+       return product;
     }
 }

@@ -1,4 +1,4 @@
-import { getProducts, getProductById, createProduct } from '@functions/index';
+import { getProducts, getProductById, createProduct, catalogBatchProcess } from '@functions/index';
 import type { AWS } from '@serverless/typescript';
 
 
@@ -19,6 +19,9 @@ const serverlessConfiguration: AWS = {
       NODE_OPTIONS: '--enable-source-maps --stack-trace-limit=1000',
       PRODUCTS_TABLE_NAME: 'products',
       STOCKS_TABLE_NAME: 'stocks',
+      CREATE_PRODUCT_TOPIC_ARN: {
+        Ref: 'createProductTopic'
+      },
     },
     iamRoleStatements: [{
       Effect: 'Allow',
@@ -35,10 +38,18 @@ const serverlessConfiguration: AWS = {
         'arn:aws:dynamodb:${opt:region, self:provider.region}:*:table/products',
         'arn:aws:dynamodb:${opt:region, self:provider.region}:*:table/stocks',
       ]
-    }],
+    },
+    {
+      Effect: 'Allow',
+      Action: 'sns:Publish',
+      Resource: {
+        Ref: 'createProductTopic',
+      },
+    },
+  ],
   },
   // import the function via paths
-  functions: { getProducts, getProductById, createProduct },
+  functions: { getProducts, getProductById, createProduct, catalogBatchProcess },
   package: { individually: true },
   custom: {
     esbuild: {
@@ -54,6 +65,26 @@ const serverlessConfiguration: AWS = {
     autoswagger: {
       apiType: "http",
       basePath: "/dev",
+    },
+  },
+  resources: {
+    Resources: {
+      createProductTopic: {
+        Type: 'AWS::SNS::Topic',
+        Properties: {
+          TopicName: 'createProductTopic', 
+        },
+      },
+      emailSubscription: {
+        Type: 'AWS::SNS::Subscription',
+        Properties: {
+          Endpoint: 'reddysaijeevan@gmail.com',
+          Protocol: 'email',
+          TopicArn: {
+            Ref: 'createProductTopic',
+          },
+        },
+      },
     },
   },
 };
