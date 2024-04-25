@@ -37,6 +37,12 @@ const serverlessConfiguration: AWS = {
           ],
         },
       },
+      {
+        Effect: "Allow",
+        Action: ["lambda:InvokeFunction"],
+        Resource:
+          "arn:aws:lambda:us-east-1:934023437220:function:authorization-service-dev-basicAuthorizer",
+      },
     ],
   },
   // import the function via paths
@@ -60,6 +66,32 @@ const serverlessConfiguration: AWS = {
         Type: 'AWS::SQS::Queue',
         Properties: {
           QueueName: 'catalogItemsQueue',
+        },
+      },
+      GatewayResponseAccessDenied401: {
+        Type: 'AWS::ApiGateway::GatewayResponse',
+        Properties: {
+          ResponseParameters: {
+              'gatewayresponse.header.Access-Control-Allow-Origin': "'*'",
+              'gatewayresponse.header.Access-Control-Allow-Headers': "'*'"
+          },
+          ResponseType: 'ACCESS_DENIED',
+          RestApiId: {
+              Ref: 'ApiGatewayRestApi'
+          }
+        },
+      },
+      GatewayResponseUnauthorized403: {
+        Type: 'AWS::ApiGateway::GatewayResponse',
+        Properties: {
+          ResponseParameters: {
+              'gatewayresponse.header.Access-Control-Allow-Origin': "'*'",
+              'gatewayresponse.header.Access-Control-Allow-Headers': "'*'"
+          },
+          ResponseType: 'UNAUTHORIZED',
+          RestApiId: {
+              Ref: 'ApiGatewayRestApi'
+          }
         },
       },
     },
